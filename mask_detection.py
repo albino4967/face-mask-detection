@@ -120,7 +120,7 @@ def collate_fn(batch):
 
 def train(model, num_epochs, data_loader, device, optimizer):
     print('----------------------train start--------------------------')
-    for epoch in range(num_epochs):
+    for epoch in range(int(num_epochs)):
         start = time.time()
         model.train()
         i = 0
