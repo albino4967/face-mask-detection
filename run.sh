@@ -1,5 +1,7 @@
 echo 'env settings ... '
 
+apt install virtualenv
+
 VENV_PATH="${SCRIPT_DIR}/venv"
 if [ ! -d ${VENV_PATH} ]; then
   virtualenv -p python3.6 "${VENV_PATH}"
