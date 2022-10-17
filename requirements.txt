@@ -25,3 +25,4 @@ tqdm==4.64.1
 typing_extensions==4.4.0
 urllib3==1.26.12
 wheel==0.37.1
+unzip==1.0.0
