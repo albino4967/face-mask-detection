@@ -6,7 +6,7 @@ echo 'download mask dataset ... '
 python data_load.py
 
 echo 'unzip dataset ... '
-nuzip mask_detection_dataset.zip
+unzip mask_detection_dataset.zip
 
 python mask_detection.py \
   --epoch 10 \
