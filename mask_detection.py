@@ -190,6 +190,8 @@ def main(learning_rate, momentum, num_epochs, weight_decay) :
     print("Prediction : ", pred[_idx]['labels'])
     plot_image_from_output(imgs[_idx], pred[_idx], "prediction_image.jpg")
 
+    torch.save(model, 'mask_detection_model')
+
 if __name__ == "__main__" :
     parser = argparse.ArgumentParser()
     parser.add_argument('--epoch', type=float, default =10, help='input epoch number')
