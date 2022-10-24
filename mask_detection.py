@@ -13,6 +13,9 @@ from tqdm import tqdm
 import pickle
 import argparse
 
+os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 class MaskDataset(object):
     def __init__(self, transforms, path):
         '''
