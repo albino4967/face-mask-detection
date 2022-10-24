@@ -13,9 +13,6 @@ from tqdm import tqdm
 import pickle
 import argparse
 
-os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
 class MaskDataset(object):
     def __init__(self, transforms, path):
         '''
@@ -166,8 +163,8 @@ def main(learning_rate, momentum, num_epochs, weight_decay) :
     test_dataset = MaskDataset(data_transform, f'{current_dir}/test_images/')
     # save
 
-    data_loader = torch.utils.data.DataLoader(dataset, batch_size=1, collate_fn=collate_fn)
-    test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, collate_fn=collate_fn)
+    data_loader = torch.utils.data.DataLoader(dataset, batch_size=4, collate_fn=collate_fn)
+    test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=2, collate_fn=collate_fn)
 
     model = get_model_instance_segmentation(4)
 
