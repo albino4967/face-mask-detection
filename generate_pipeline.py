@@ -270,4 +270,4 @@ def fashion_mnist_pipeline():
 if __name__ == '__main__':
     # Compiling the pipeline
     import kfp
-    kfp.compiler.Compiler().compile(fashion_mnist_pipeline, 'test.yaml')
+    kfp.compiler.Compiler().compile(fashion_mnist_pipeline, 'mask_detection_train_pipeline.yaml')
