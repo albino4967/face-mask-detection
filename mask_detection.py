@@ -158,13 +158,13 @@ def main(learning_rate, momentum, num_epochs, weight_decay) :
     data_transform = transforms.Compose([  # transforms.Compose : list 내의 작업을 연달아 할 수 있게 호출하는 클래스
         transforms.ToTensor()  # ToTensor : numpy 이미지에서 torch 이미지로 변경
     ])
-
-    dataset = MaskDataset(data_transform, 'images/')
-    test_dataset = MaskDataset(data_transform, 'test_images/')
+    current_dir = os.getcwd()
+    dataset = MaskDataset(data_transform, f'{current_dir}/images/')
+    test_dataset = MaskDataset(data_transform, f'{current_dir}/test_images/')
     # save
 
-    data_loader = torch.utils.data.DataLoader(dataset, batch_size=4, collate_fn=collate_fn)
-    test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=2, collate_fn=collate_fn)
+    data_loader = torch.utils.data.DataLoader(dataset, batch_size=1, collate_fn=collate_fn)
+    test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, collate_fn=collate_fn)
 
     model = get_model_instance_segmentation(4)
 
