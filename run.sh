@@ -9,7 +9,7 @@ echo 'unzip dataset ... '
 unzip mask_detection_dataset.zip
 
 python mask_detection.py \
-  --epoch 10 \
+  --epoch 30 \
   --weight_decay 0.0005 \
   --learning_rate 0.001 \
   --momentum 0.9

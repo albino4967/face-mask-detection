@@ -1,4 +1,6 @@
 import os
+import random
+
 import numpy as np
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
@@ -12,6 +14,7 @@ import torch
 from tqdm import tqdm
 import pickle
 import argparse
+import model as md
 
 class MaskDataset(object):
     def __init__(self, transforms, path):
@@ -49,11 +52,10 @@ class MaskDataset(object):
 
 def plot_image_from_output(img, annotation, file_name):
     img = img.cpu().permute(1, 2, 0)
-
     fig, ax = plt.subplots(1)
     ax.imshow(img)
     for idx in range(len(annotation["boxes"])):
-        xmin, ymin, xmax, ymax = annotation["boxes"][idx]
+        xmin, ymin, xmax, ymax = annotation["boxes"][idx].cpu()
         if annotation['labels'][idx] == 1:
             rect = patches.Rectangle((xmin, ymin), (xmax - xmin), (ymax - ymin), linewidth=1, edgecolor='r',
                                      facecolor='none')
@@ -76,14 +78,13 @@ def generate_box(obj):
     return [xmin, ymin, xmax, ymax]
 
 def generate_label(obj):
-    adjust_label = 1
     if obj.find('name').text == "with_mask":
-        return 1 + adjust_label
+        return 1
 
     elif obj.find('name').text == "mask_weared_incorrect":
-        return 2 + adjust_label
+        return 2
 
-    return 0 + adjust_label
+    return 0
 
 def generate_target(file):
     with open(file) as f:
@@ -108,13 +109,6 @@ def generate_target(file):
 
         return target
 
-def get_model_instance_segmentation(num_classes):
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
-    in_features = model.roi_heads.box_predictor.cls_score.in_features
-    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
-
-    return model
-
 def collate_fn(batch):
     return tuple(zip(*batch))
 
@@ -138,6 +132,7 @@ def train(model, num_epochs, data_loader, device, optimizer):
             epoch_loss += losses
         print(f'epoch : {epoch + 1}, Loss : {epoch_loss}, time : {time.time() - start}')
 
+
 def make_prediction(model, img, threshold):
     model.eval()
     preds = model(img)
@@ -155,18 +150,19 @@ def make_prediction(model, img, threshold):
     return preds
 
 def main(learning_rate, momentum, num_epochs, weight_decay) :
-    data_transform = transforms.Compose([  # transforms.Compose : list 내의 작업을 연달아 할 수 있게 호출하는 클래스
-        transforms.ToTensor()  # ToTensor : numpy 이미지에서 torch 이미지로 변경
+    data_transform = transforms.Compose([
+        transforms.ToTensor()
     ])
     current_dir = os.getcwd()
     dataset = MaskDataset(data_transform, f'{current_dir}/images/')
     test_dataset = MaskDataset(data_transform, f'{current_dir}/test_images/')
     # save
 
-    data_loader = torch.utils.data.DataLoader(dataset, batch_size=4, collate_fn=collate_fn)
+    data_loader = torch.utils.data.DataLoader(dataset, batch_size=1, collate_fn=collate_fn)
     test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=2, collate_fn=collate_fn)
 
-    model = get_model_instance_segmentation(4)
+    model = md.FRCNNObjectDetector()
+    print(model)
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model.to(device)
@@ -184,13 +180,15 @@ def main(learning_rate, momentum, num_epochs, weight_decay) :
             print(pred)
             break
 
-    _idx = 1
+    output_workspace = f'{os.path.dirname(os.path.realpath(__file__))}/output/'
+    if os.path.isdir(output_workspace) is False:
+        os.mkdir(output_workspace)
+    _idx = random.randint(1,100)
     print("Target : ", annotations[_idx]['labels'])
-    plot_image_from_output(imgs[_idx], annotations[_idx], "target_image.jpg")
+    plot_image_from_output(imgs[_idx], annotations[_idx], f"{output_workspace}/target_image.jpg")
     print("Prediction : ", pred[_idx]['labels'])
-    plot_image_from_output(imgs[_idx], pred[_idx], "prediction_image.jpg")
-
-    torch.save(model, 'mask_detection_model')
+    plot_image_from_output(imgs[_idx], pred[_idx], f"{output_workspace}/prediction_image_test.jpg")
+    torch.save(model.state_dict(), f'{output_workspace}/mask_detection_model_epochs_{num_epochs}.pth')
 
 if __name__ == "__main__" :
     parser = argparse.ArgumentParser()

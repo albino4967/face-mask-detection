@@ -28,3 +28,6 @@ wheel==0.37.1
 unzip==1.0.0
 torch==1.12.1
 torchvision==0.13.1
+torchserve==0.6.0
+torch-model-archiver==0.6.0
+torch-workflow-archiver==0.2.4
